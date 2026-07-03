@@ -1,0 +1,49 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Packaging / build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Coverage / test reports
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Editor / OS cruft
+.vscode/
+.idea/
+.DS_Store
+
+# Large or generated data files - keep the repo lean; store these
+# externally (e.g. cloud storage, Git LFS) and document the download
+# steps in the README if they are ever needed.
+*.csv
+*.tsv
+*.dat
+*.bin
+*.npy
+*.npz
+*.parquet
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+
+# Local logs / notebook checkpoints
+*.log
+.ipynb_checkpoints/

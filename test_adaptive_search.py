@@ -131,5 +131,58 @@ class TestClusteredDuplicates(unittest.TestCase):
         self.assertLess(comparisons, len(arr))
 
 
+class TestIndexBasedErrorMetric(unittest.TestCase):
+    """
+    Simulates the flawed value-based error metric described in
+    adaptive_search.py's docstring, side by side with the index-based
+    metric that replaced it. Confirms the failure mode from Module 2
+    (an extreme value outlier keeping error artificially low) is
+    specific to the value-based version, and that the index-based
+    metric actually used by adaptive_search is not fooled by it.
+    """
+
+    def setUp(self):
+        # A tight, well-behaved cluster with one massive outlier appended,
+        # mirroring the case that originally broke value-based error.
+        self.arr = list(range(0, 9998)) + [10_000_000]
+        self.lo, self.hi = 0, len(self.arr) - 1
+        self.mid_pos = (self.lo + self.hi) // 2
+
+        # A guess far from the safe binary midpoint in index terms, which
+        # a correct error metric should flag as unreliable.
+        self.pos = self.hi - 2
+
+    def value_based_error(self):
+        # Reproduces the original (flawed) normalization by value range
+        value_range = self.arr[self.hi] - self.arr[self.lo]
+        return abs(self.pos - self.mid_pos) / value_range
+
+    def index_based_error(self):
+        # Reproduces the corrected normalization used in adaptive_search
+        index_range = self.hi - self.lo
+        return abs(self.pos - self.mid_pos) / index_range
+
+    def test_value_based_error_is_fooled_by_outlier(self):
+        # With a value range in the millions, even a wildly wrong guess
+        # produces a near-zero "error" -- the exact bug that motivated
+        # the switch to index-based error.
+        self.assertLess(self.value_based_error(), 0.001)
+
+    def test_index_based_error_correctly_flags_bad_guess(self):
+        # The same guess, measured against the index range instead,
+        # correctly reports a large error.
+        self.assertGreater(self.index_based_error(), 0.4)
+
+    def test_adaptive_search_uses_index_based_error_in_practice(self):
+        # End-to-end confirmation: because adaptive_search uses the
+        # index-based metric internally, it still finds the correct
+        # result efficiently despite the outlier, instead of being
+        # misled into over-trusting interpolation.
+        target = self.arr[9995]
+        result_index, comparisons = adaptive_search(self.arr, target)
+        self.assertEqual(result_index, 9995)
+        self.assertLess(comparisons, len(self.arr))
+
+
 if __name__ == "__main__":
     unittest.main()

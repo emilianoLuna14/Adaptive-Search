@@ -27,8 +27,8 @@ Adaptive-Search/
 ├── adaptive_search.py       # Core algorithm implementation
 ├── binary_search.py         # Baseline binary search implementation
 ├── interpolation_search.py  # Baseline interpolation search implementation
-├── benchmarks/              # Scripts and data for reproducing comparison counts
-├── tests/                   # Automated test suite
+├── run_benchmarks.py        # Reproduces the comparison-count benchmarks
+├── test_adaptive_search.py  # Automated test suite
 └── README.md
 
 ## Requirements
@@ -36,34 +36,46 @@ Adaptive-Search/
 - Python 3.9 or later
 - No external dependencies beyond the standard library
 
+## Data
+
+This project does not depend on any external or downloaded datasets. All
+arrays used for testing and benchmarking (uniform, skewed, mixed, and
+adversarial-outlier distributions) are generated programmatically inside
+`test_adaptive_search.py` and `run_benchmarks.py`, so cloning the
+repository and running the commands below is sufficient to reproduce all
+results.
+
+## Running the main script
+
+Adaptive Search is used as a library function, `adaptive_search(arr, target)`,
+returning `(index, comparisons)`. The runnable entry point that exercises it
+end-to-end is the benchmark script:
+
+```bash
+python run_benchmarks.py
+```
+
+This averages comparison counts over 2,000 random queries per array size
+and prints a table comparing Adaptive Search against plain binary search
+and plain interpolation search, across uniform, skewed, and mixed
+datasets at n = 1,000,000. Wall-clock time is not used as the primary
+metric since it is dominated by Python interpreter overhead; comparison
+counts are the more honest measure of algorithmic efficiency.
+
 ## Running the test suite
 
 From the repository root:
 
 ```bash
-python -m unittest discover -s tests
+python -m unittest test_adaptive_search -v
 ```
 
-Or, if a Makefile is included:
-
-```bash
-make test
-```
-
-## Reproducing benchmark results
-
-To reproduce the comparison-count benchmarks across uniform, skewed, and
-mixed datasets:
-
-```bash
-python benchmarks/run_benchmarks.py
-```
-
-This averages comparison counts over 2,000 random queries per array size
-and prints a table comparing Adaptive Search against plain binary search
-and plain interpolation search. Wall-clock time is not used as the
-primary metric since it is dominated by Python interpreter overhead;
-comparison counts are the more honest measure of algorithmic efficiency.
+This runs the full automated suite, including basic correctness checks,
+randomized fuzz tests against Python's built-in list indexing, and the
+three adversarial scenarios: a mixed uniform/skewed dataset, a tight
+cluster with an extreme outlier appended, and a simulated comparison of
+the value-based vs. index-based error metric that demonstrates why the
+index-based version was adopted.
 
 ## Known limitations
 
