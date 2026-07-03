@@ -83,7 +83,3 @@ The error metric was originally value-based and could be skewed by
 extreme outliers in the dataset. This has been corrected to an
 index-based metric. Further stress testing against clustered duplicates
 and multiple-outlier distributions is ongoing.
-
-## License
-
-This project was completed for CS 460 as a final course project.
